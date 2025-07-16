@@ -17,7 +17,7 @@ import java.time.Duration;
 
 public class BaseTest {
     protected WebDriver driver;
-    protected String seleniumGridUrl = "http://localhost:4444/wd/hub";
+    protected String seleniumGridUrl = "http://selenium-hub:4444/wd/hub";
 
     @BeforeMethod
     @Parameters({"browser"})
