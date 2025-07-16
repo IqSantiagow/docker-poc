@@ -22,7 +22,7 @@ pipeline {
         stage("Run selenium grid"){
             steps {
                 // Start the Selenium Grid
-                sh 'docker-compose up -d'
+                sh 'docker compose up -d'
             }
         }
         stage("Run Tests") {
