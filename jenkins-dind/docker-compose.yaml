@@ -1,5 +1,5 @@
 version: "3.9"
-
+name: jenkins-set
 networks:
   jenkins:
 
@@ -31,8 +31,8 @@ services:
     depends_on:
       - dind
     build:
-      context: ..
-      dockerfile: Dockerfile
+      context: ./
+      dockerfile: ./Dockerfile
     container_name: jenkins
     restart: unless-stopped
     networks:
