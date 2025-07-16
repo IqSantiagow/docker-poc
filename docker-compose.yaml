@@ -1,0 +1,15 @@
+services:
+  selenium-hub:
+    image: selenium/hub:nightly
+    container_name: selenium-hub
+    ports:
+      - "4444:4444"
+  chrome-node:
+    image: selenium/node-chrome:nightly
+    volumes:
+      - /dev/shm:/dev/shm
+    depends_on:
+      - selenium-hub
+    environment:
+      - HUB_HOST=selenium-hub
+      - HUB_PORT=4444
