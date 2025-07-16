@@ -17,18 +17,13 @@ import java.time.Duration;
 
 public class BaseTest {
     protected WebDriver driver;
-    protected String seleniumGridUrl = "http://localhost:4444";
-    protected String jenkinsUrl = "http://localhost:80";
+    protected String seleniumGridUrl = "http://localhost:4444/wd/hub";
 
     @BeforeMethod
     @Parameters({"browser"})
     public void setUp(String browser) throws MalformedURLException {
         if (System.getProperty("selenium.grid.url") != null) {
             seleniumGridUrl = System.getProperty("selenium.grid.url");
-        }
-
-        if (System.getProperty("jenkins.url") != null) {
-            jenkinsUrl = System.getProperty("jenkins.url");
         }
 
         driver = createDriver(browser);
@@ -43,7 +38,7 @@ public class BaseTest {
                 chromeOptions.addArguments("--no-sandbox");
                 chromeOptions.addArguments("--disable-dev-shm-usage");
                 chromeOptions.addArguments("--disable-gpu");
-
+                chromeOptions.addArguments("--headless=new");
                 if (isRunningInDocker()) {
                     return new RemoteWebDriver(new URL(seleniumGridUrl), chromeOptions);
                 } else {
@@ -68,8 +63,9 @@ public class BaseTest {
     }
 
     private boolean isRunningInDocker() {
-        return System.getProperty("docker.environment") != null &&
-                System.getProperty("docker.environment").equals("true");
+//        return System.getProperty("is.remote.run") != null &&
+//                System.getProperty("is.remote.run").equals("true");
+        return true;
     }
 
     @AfterMethod
