@@ -8,6 +8,9 @@ services:
       - "4444:4444"
   chrome-node:
     image: selenium/node-chrome:4.15.0
+    deploy:
+      replicas: 5
+    shm_size: 2gb
     volumes:
       - /dev/shm:/dev/shm
     depends_on:
