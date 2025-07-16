@@ -22,10 +22,6 @@ public class BaseTest {
     @BeforeMethod
     @Parameters({"browser"})
     public void setUp(String browser) throws MalformedURLException {
-        if (System.getProperty("selenium.grid.url") != null) {
-            seleniumGridUrl = System.getProperty("selenium.grid.url");
-        }
-
         driver = createDriver(browser);
         driver.manage().timeouts().implicitlyWait(Duration.ofSeconds(10));
         driver.manage().window().maximize();
@@ -40,6 +36,7 @@ public class BaseTest {
                 chromeOptions.addArguments("--disable-gpu");
                 chromeOptions.addArguments("--headless=new");
                 if (isRunningInDocker()) {
+                    System.out.println(seleniumGridUrl);
                     return new RemoteWebDriver(new URL(seleniumGridUrl), chromeOptions);
                 } else {
                     WebDriverManager.chromedriver().setup();
