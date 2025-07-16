@@ -6,15 +6,18 @@ services:
       - "4442:4442"
       - "4443:4443"
       - "4444:4444"
+    healthcheck:
+      test: [ "CMD", "curl", "-f", "http://localhost:4444/wd/hub/status" ]
+      interval: 1s
+      timeout: 30s
+      retries: 30
   chrome-node:
     image: selenium/node-chrome:4.15.0
-    deploy:
-      replicas: 5
-    shm_size: 2gb
     volumes:
       - /dev/shm:/dev/shm
     depends_on:
-      - selenium-hub
+      selenium-hub:
+        condition: service_healthy
     environment:
       - SE_EVENT_BUS_HOST=selenium-hub
       - SE_EVENT_BUS_PUBLISH_PORT=4442
