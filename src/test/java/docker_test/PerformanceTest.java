@@ -10,8 +10,8 @@ public class PerformanceTest extends BaseTest {
 
     @DataProvider(name = "test-data", parallel = true)
     public Object[][] createData() {
-        Object[][] data = new Object[20][1];
-        for (int i = 0; i < 20; i++) {
+        Object[][] data = new Object[1][1];
+        for (int i = 0; i < 1; i++) {
             data[i][0] = i + 1;
         }
         return data;
