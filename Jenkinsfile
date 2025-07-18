@@ -23,7 +23,7 @@ pipeline {
             steps {
                 script {
                     echo "Starting Selenium Grid for build ${BUILD_NUMBER}"
-                    
+
                     // Start the Selenium Grid with unique network
                     sh """
                         export BUILD_NUMBER=${BUILD_NUMBER}
@@ -47,6 +47,10 @@ pipeline {
         stage("Run Tests") {
             steps {
                 script {
+                    sh """
+                        echo "Testing Jenkins container access to Selenium hub..."
+                        curl -f http://localhost:4444/wd/hub/status || echo "Jenkins cannot reach hub via localhost"
+                       """
                     // Run the tests using Maven with hardcoded hub URL
                     sh """
                         mvn test -Dselenium.hub.url=http://selenium-hub:4444/wd/hub
@@ -64,14 +68,14 @@ pipeline {
 //                    docker compose down --remove-orphans || true
 //                    docker network prune -f || true
                 """
-                
+
                 // Generate Allure reports
                 allure([
                         includeProperties: false,
-                        jdk: '',
-                        properties: [],
+                        jdk              : '',
+                        properties       : [],
                         reportBuildPolicy: 'ALWAYS',
-                        results: [[path: 'target/allure-results']]
+                        results          : [[path: 'target/allure-results']]
                 ])
             }
         }
