@@ -22,33 +22,60 @@ pipeline {
         stage("Run selenium grid") {
             steps {
                 script {
-                    // Start the Selenium Grid
-                    sh 'docker compose up -d'
+                    // Calculate unique ports for this build
+                    def basePort = 4400 + (BUILD_NUMBER as Integer % 100)
+                    env.HUB_PORT_4442 = "${basePort + 42}"
+                    env.HUB_PORT_4443 = "${basePort + 43}"
+                    env.HUB_PORT_4444 = "${basePort + 44}"
+                    
+                    echo "Starting Selenium Grid for build ${BUILD_NUMBER}"
+                    echo "Hub ports: ${env.HUB_PORT_4442}, ${env.HUB_PORT_4443}, ${env.HUB_PORT_4444}"
+                    
+                    // Start the Selenium Grid with unique network and ports
+                    sh """
+                        export BUILD_NUMBER=${BUILD_NUMBER}
+                        export HUB_PORT_4442=${env.HUB_PORT_4442}
+                        export HUB_PORT_4443=${env.HUB_PORT_4443}
+                        export HUB_PORT_4444=${env.HUB_PORT_4444}
+                        docker compose up -d
+                    """
 
                     // Pause for manual debugging
                     input(message: "Selenium Grid is up. Pause for debugging. Verify if it's working and resume once ready.")
 
                     // Optionally verify the grid status automatically
-                    sh '''
-                        CONTAINER_ID=$(docker ps --filter "name=selenium" --format "{{.ID}}")
-                        echo "Found Selenium Grid Container: $CONTAINER_ID"
+                    sh """
+                        CONTAINER_ID=\$(docker ps --filter "name=selenium-hub-${BUILD_NUMBER}" --format "{{.ID}}")
+                        echo "Found Selenium Grid Container: \$CONTAINER_ID"
 
                         # Curl request to check grid status
-                        docker exec $CONTAINER_ID curl http://localhost:4444/status || echo "Unable to fetch grid status"
-                    '''
+                        docker exec \$CONTAINER_ID curl http://localhost:4444/status || echo "Unable to fetch grid status"
+                    """
                 }
             }
         }
         stage("Run Tests") {
             steps {
-                // Run the tests using Maven
-                sh 'mvn test'
+                script {
+                    // Run the tests using Maven with dynamic hub URL
+                    sh """
+                        export SELENIUM_HUB_URL=http://localhost:${env.HUB_PORT_4444}/wd/hub
+                        mvn test -Dselenium.hub.url=http://localhost:${env.HUB_PORT_4444}/wd/hub
+                    """
+                }
             }
         }
     }
     post {
         always {
             script {
+                // Clean up Docker containers and networks
+                sh """
+                    export BUILD_NUMBER=${BUILD_NUMBER}
+                    docker compose down --remove-orphans || true
+                    docker network prune -f || true
+                """
+                
                 // Generate Allure reports
                 allure([
                         includeProperties: false,
