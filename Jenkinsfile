@@ -22,21 +22,11 @@ pipeline {
         stage("Run selenium grid") {
             steps {
                 script {
-                    // Calculate unique ports for this build
-                    def basePort = 4400 + (BUILD_NUMBER as Integer % 100)
-                    env.HUB_PORT_4442 = "${basePort + 42}"
-                    env.HUB_PORT_4443 = "${basePort + 43}"
-                    env.HUB_PORT_4444 = "${basePort + 44}"
-                    
                     echo "Starting Selenium Grid for build ${BUILD_NUMBER}"
-                    echo "Hub ports: ${env.HUB_PORT_4442}, ${env.HUB_PORT_4443}, ${env.HUB_PORT_4444}"
                     
-                    // Start the Selenium Grid with unique network and ports
+                    // Start the Selenium Grid with unique network
                     sh """
                         export BUILD_NUMBER=${BUILD_NUMBER}
-                        export HUB_PORT_4442=${env.HUB_PORT_4442}
-                        export HUB_PORT_4443=${env.HUB_PORT_4443}
-                        export HUB_PORT_4444=${env.HUB_PORT_4444}
                         docker compose up -d
                     """
 
@@ -57,10 +47,9 @@ pipeline {
         stage("Run Tests") {
             steps {
                 script {
-                    // Run the tests using Maven with dynamic hub URL
+                    // Run the tests using Maven with hardcoded hub URL
                     sh """
-                        export SELENIUM_HUB_URL=http://localhost:${env.HUB_PORT_4444}/wd/hub
-                        mvn test -Dselenium.hub.url=http://localhost:${env.HUB_PORT_4444}/wd/hub
+                        mvn test -Dselenium.hub.url=http://selenium-hub:4444/wd/hub
                     """
                 }
             }

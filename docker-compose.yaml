@@ -3,9 +3,9 @@ services:
     image: selenium/hub:4.15.0
     container_name: selenium-hub-${BUILD_NUMBER:-default}
     ports:
-      - "${HUB_PORT_4442:-4442}:4442"
-      - "${HUB_PORT_4443:-4443}:4443"
-      - "${HUB_PORT_4444:-4444}:4444"
+      - "4442:4442"
+      - "4443:4443"
+      - "4444:4444"
     healthcheck:
       test: [ "CMD", "curl", "-f", "http://localhost:4444/wd/hub/status" ]
       interval: 1s
