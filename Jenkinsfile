@@ -61,8 +61,8 @@ pipeline {
                 // Clean up Docker containers and networks
                 sh """
                     export BUILD_NUMBER=${BUILD_NUMBER}
-                    docker compose down --remove-orphans || true
-                    docker network prune -f || true
+//                    docker compose down --remove-orphans || true
+//                    docker network prune -f || true
                 """
                 
                 // Generate Allure reports
