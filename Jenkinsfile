@@ -53,7 +53,7 @@ pipeline {
                        """
                     // Run the tests using Maven with hardcoded hub URL
                     sh """
-                        mvn test -Dselenium.hub.url=http://localhost:4444/wd/hub
+                        mvn test -Dselenium.hub.url=http://host.docker.internal:4444/wd/hub
                     """
                 }
             }
