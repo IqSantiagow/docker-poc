@@ -1,0 +1,10 @@
+docker-plugin:latest
+docker-commons:latest
+docker-build-step:latest
+ssh-slaves:latest
+workflow-aggregator:latest
+allure-jenkins-plugin:latest
+maven-plugin:latest
+git:latest
+build-timeout:latest
+timestamper:latest

@@ -1,7 +1,9 @@
 #!groovy
 
 pipeline {
-    agent any
+    agent {
+        label 'docker-agent'
+    }
     stages {
         stage("Cleanup and checkout") {
             steps {
@@ -48,12 +50,12 @@ pipeline {
             steps {
                 script {
                     sh """
-                        echo "Testing Jenkins container access to Selenium hub..."
-                        curl -f http://localhost:4444/wd/hub/status || echo "Jenkins cannot reach hub via localhost"
+                        echo "Testing slave container access to Selenium hub..."
+                        curl -f http://localhost:4444/wd/hub/status || echo "Slave cannot reach hub via localhost"
                        """
-                    // Run the tests using Maven with hardcoded hub URL
+                    // Run the tests using Maven with localhost hub URL (slave has direct access)
                     sh """
-                        mvn test -Dselenium.hub.url=http://host.docker.internal:4444/wd/hub
+                        mvn test -Dselenium.hub.url=http://localhost:4444/wd/hub
                     """
                 }
             }
@@ -65,8 +67,8 @@ pipeline {
                 // Clean up Docker containers and networks
                 sh """
                     export BUILD_NUMBER=${BUILD_NUMBER}
-//                    docker compose down --remove-orphans || true
-//                    docker network prune -f || true
+                    docker compose down --remove-orphans || true
+                    docker network prune -f || true
                 """
 
                 // Generate Allure reports

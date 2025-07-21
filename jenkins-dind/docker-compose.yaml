@@ -1,49 +1,35 @@
 version: "3.9"
 name: jenkins-set
-networks:
-  jenkins:
 
 volumes:
   jenkins-docker-certs:
   jenkins-home:
 
+networks:
+  jenkins-network:
+    driver: bridge
+
 services:
-  dind:
-    image: docker:dind
-    container_name: jenkins-docker
-    restart: unless-stopped
-    privileged: true
-    networks:
-      jenkins:
-         aliases:
-            - docker
-    ports:
-      - "2376:2376"
-
-    environment:
-      DOCKER_TLS_CERTDIR: "/certs"
-
-    volumes:
-      - jenkins-docker-certs:/certs/client
-      - jenkins-home:/var/jenkins_home
-
   jenkins:
-    depends_on:
-      - dind
     build:
       context: ./
       dockerfile: ./Dockerfile
-    container_name: jenkins
+    container_name: jenkins-master
     restart: unless-stopped
     networks:
-      - jenkins
+      - jenkins-network
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
     ports:
       - "80:8080"
+      - "50000:50000"
     environment:
-      DOCKER_HOST: "tcp://docker:2376"
+      DOCKER_HOST: "unix:///var/run/docker.sock"
       DOCKER_CERT_PATH: "/certs/client"
       DOCKER_TLS_VERIFY: 1
+      JENKINS_OPTS: "--prefix="
     user: root
     volumes:
       - jenkins-home:/var/jenkins_home
       - jenkins-docker-certs:/certs/client
+      - /var/run/docker.sock:/var/run/docker.sock
