@@ -30,6 +30,17 @@ pipeline {
                         docker compose up -d
                     """
 
+                    // Get the container IP address that's accessible from the host
+                    def hubIp = sh(
+                            script: "docker inspect -f '{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}' selenium-hub-${BUILD_NUMBER}",
+                            returnStdout: true
+                    ).trim()
+
+                    // Store the IP for use in the next stage
+                    env.SELENIUM_HUB_IP = hubIp
+
+                    echo "Selenium Hub IP: ${hubIp}"
+
                     // Pause for manual debugging
                     input(message: "Selenium Grid is up. Pause for debugging. Verify if it's working and resume once ready.")
 
@@ -41,6 +52,7 @@ pipeline {
                         # Curl request to check grid status
                         docker exec \$CONTAINER_ID curl http://localhost:4444/status || echo "Unable to fetch grid status"
                     """
+
                 }
             }
         }
