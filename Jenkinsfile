@@ -1,9 +1,7 @@
 #!groovy
 
 pipeline {
-    agent {
-        label 'docker-agent'
-    }
+    agent any
     stages {
         stage("Cleanup and checkout") {
             steps {

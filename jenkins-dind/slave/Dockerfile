@@ -1,47 +1,53 @@
-FROM maven:3.9-openjdk-21-slim
+FROM maven:3.9.11-eclipse-temurin-21-alpine
+
+# Jenkins agent environment variables
+ENV AGENT_WORKDIR=/home/jenkins/agent
+ENV JENKINS_AGENT_HOME=/home/jenkins
+ENV JENKINS_AGENT_WORKDIR=${AGENT_WORKDIR}
 
 # Install Jenkins agent dependencies and Docker
-RUN apt-get update && apt-get install -y \
+RUN apk update && apk add --no-cache \
     openssh-server \
     git \
     curl \
     ca-certificates \
     gnupg \
-    lsb-release \
-    && rm -rf /var/lib/apt/lists/*
+    sudo \
+    bash \
+    shadow \
+    docker \
+    docker-compose
 
-# Add Docker's official GPG key and repository
-RUN mkdir -p /etc/apt/keyrings \
-    && curl -fsSL https://download.docker.com/linux/debian/gpg | gpg --dearmor -o /etc/apt/keyrings/docker.gpg \
-    && echo "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.gpg] https://download.docker.com/linux/debian $(lsb_release -cs) stable" | tee /etc/apt/sources.list.d/docker.list > /dev/null
+# Create Jenkins user with proper UID/GID for Docker cloud compatibility
+RUN addgroup -g 1000 jenkins \
+    && adduser -u 1000 -G jenkins -h /home/jenkins -s /bin/bash -D jenkins \
+    && addgroup jenkins docker
 
-# Install Docker CE and Docker Compose
-RUN apt-get update && apt-get install -y \
-    docker-ce \
-    docker-ce-cli \
-    containerd.io \
-    docker-compose-plugin \
-    && rm -rf /var/lib/apt/lists/*
-
-# Create Jenkins user
-RUN useradd -m -d /home/jenkins -s /bin/bash jenkins \
-    && usermod -aG docker jenkins
+# Set up Jenkins agent directories
+RUN mkdir -p ${AGENT_WORKDIR} \
+    && chown -R jenkins:jenkins ${JENKINS_AGENT_HOME} \
+    && chmod 755 ${AGENT_WORKDIR}
 
 # Set up SSH for Jenkins agent connection
 RUN mkdir /var/run/sshd \
     && echo 'jenkins:jenkins' | chpasswd \
-    && echo 'jenkins ALL=(ALL) NOPASSWD:ALL' >> /etc/sudoers
+    && echo 'jenkins ALL=(ALL) NOPASSWD:ALL' >> /etc/sudoers \
+    && sed -i 's/#PermitRootLogin prohibit-password/PermitRootLogin yes/' /etc/ssh/sshd_config \
+    && sed -i 's/#PasswordAuthentication yes/PasswordAuthentication yes/' /etc/ssh/sshd_config
 
 # Create SSH directory for Jenkins user
 RUN mkdir -p /home/jenkins/.ssh \
     && chown -R jenkins:jenkins /home/jenkins/.ssh \
     && chmod 700 /home/jenkins/.ssh
 
-# Copy Selenium Grid docker-compose configuration
-COPY --chown=jenkins:jenkins test-environment/docker-compose.yml /home/jenkins/docker-compose.yaml
+# Switch to Jenkins user for proper ownership
+USER jenkins
 
-# Set working directory
-WORKDIR /home/jenkins
+# Set working directory to agent workdir
+WORKDIR ${AGENT_WORKDIR}
+
+# Switch back to root for startup
+USER root
 
 # Expose SSH port
 EXPOSE 22
