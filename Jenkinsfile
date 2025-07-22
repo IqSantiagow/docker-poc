@@ -63,13 +63,14 @@ pipeline {
                     sh """
                         echo "Testing slave container access to Selenium hub..."
                         curl -f http://localhost:4444/wd/hub/status || echo "Slave cannot reach hub via localhost"
+                       
                        """
 
                     input(message: "Waiting for manual confirmation that the hub is reachable from the slave container.")
 
                     // Run the tests using Maven with localhost hub URL (slave has direct access)
                     sh """
-                        mvn test -Dselenium.hub.url=http://${env.SELENIUM_HUB_IP}:4444/wd/hub
+                        mvn test -Dselenium.hub.url=http://selenium-hub:4444/wd/hub
                     """
                 }
             }
