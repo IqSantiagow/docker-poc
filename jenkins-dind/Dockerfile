@@ -1,8 +1,5 @@
 FROM jenkins/jenkins:jdk21
 
-# Install suggested plugins and Docker plugin
-COPY plugins.txt /usr/share/jenkins/ref/plugins.txt
-RUN jenkins-plugin-cli --plugin-file /usr/share/jenkins/ref/plugins.txt
 
 USER root
 RUN apt-get update -qq \
