@@ -8,9 +8,6 @@ services:
     shm_size: 2gb
     volumes:
       - /dev/shm:/dev/shm
-    depends_on:
-      selenium-hub:
-        condition: service_healthy
     environment:
       - SE_EVENT_BUS_HOST=selenium-hub
       - SE_EVENT_BUS_PUBLISH_PORT=4442
