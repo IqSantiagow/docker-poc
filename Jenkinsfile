@@ -70,7 +70,7 @@ pipeline {
 
                     // Run the tests using Maven with localhost hub URL (slave has direct access)
                     sh """
-                        mvn test -Dselenium.hub.url=http://selenium-hub:4444/wd/hub
+                        mvn test -Dselenium.hub.url=http://localhost:4444/wd/hub
                     """
                 }
             }
