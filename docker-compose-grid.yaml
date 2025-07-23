@@ -1,0 +1,24 @@
+services:
+  selenium-hub:
+    image: selenium/hub:4.15.0
+    container_name: selenium-hub-persistent
+    ports:
+      - "4442:4442"
+      - "4443:4443"
+      - "4444:4444"
+    environment:
+      - SE_SESSION_REQUEST_TIMEOUT=300
+      - SE_SESSION_RETRY_INTERVAL=2
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:4444/wd/hub/status"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    restart: unless-stopped
+    networks:
+      - selenium-grid-network
+
+networks:
+  selenium-grid-network:
+    name: selenium-grid-network
+    driver: bridge

@@ -1,19 +1,8 @@
 services:
-  selenium-hub:
-    image: selenium/hub:4.15.0
-    container_name: selenium-hub-${BUILD_NUMBER:-default}
-    ports:
-      - "4442:4442"
-      - "4443:4443"
-      - "4444:4444"
-    healthcheck:
-      test: [ "CMD", "curl", "-f", "http://localhost:4444/wd/hub/status" ]
-      interval: 1s
-      timeout: 30s
-      retries: 30
-    networks:
-      - selenium-network
   chrome-node:
+    deploy:
+      mode: replicated
+      replicas: 3
     image: selenium/node-chrome:4.15.0
     container_name: chrome-node-${BUILD_NUMBER:-default}
     shm_size: 2gb
@@ -31,5 +20,5 @@ services:
 
 networks:
   selenium-network:
-    name: selenium-network-${BUILD_NUMBER:-default}
+    name: selenium-grid-network
     driver: bridge
