@@ -1,8 +1,5 @@
 services:
   chrome-node:
-    deploy:
-      mode: replicated
-      replicas: 3
     image: selenium/node-chrome:4.15.0
     container_name: chrome-node-${BUILD_NUMBER:-default}
     shm_size: 2gb
