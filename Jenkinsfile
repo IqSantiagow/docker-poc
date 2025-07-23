@@ -207,7 +207,7 @@ pipeline {
                 // Stop and remove the Chrome node
                 sh """
                     export BUILD_NUMBER=${BUILD_NUMBER}
-                    docker compose -f ${NODE_COMPOSE_FILE} down --remove-orphans || true
+                    docker compose -f ${NODE_COMPOSE_FILE} down || true
                     
                     # Ensure the specific container is removed
                     docker rm -f chrome-node-${BUILD_NUMBER} 2>/dev/null || true
