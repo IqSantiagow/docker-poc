@@ -1,6 +1,7 @@
 package docker_test;
 
 import com.codeborne.selenide.Configuration;
+import io.github.bonigarcia.wdm.WebDriverManager;
 import org.testng.annotations.AfterMethod;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Parameters;
@@ -13,6 +14,7 @@ public class BaseTest {
     @BeforeMethod
     @Parameters({"browser"})
     public void setUp(String browser) {
+        WebDriverManager.chromedriver().setup();
         Configuration.browser = browser.toLowerCase();
         Configuration.remote = seleniumGridUrl;
         Configuration.timeout = 10000;
