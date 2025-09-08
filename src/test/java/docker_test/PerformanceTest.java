@@ -6,6 +6,8 @@ import io.qameta.allure.Step;
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
 
+import static com.codeborne.selenide.Selenide.open;
+
 public class PerformanceTest extends BaseTest {
 
     @DataProvider(name = "test-data", parallel = true)
@@ -26,7 +28,7 @@ public class PerformanceTest extends BaseTest {
 
     @Step("Navigate to Google for execution #{executionNumber}")
     private void navigateToGoogle(int executionNumber) {
-        driver.get("https://www.google.com");
+        open("https://www.google.com");
     }
 
 }
