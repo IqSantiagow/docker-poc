@@ -7,6 +7,7 @@ import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
 
 import static com.codeborne.selenide.Selenide.open;
+import static com.codeborne.selenide.Selenide.sleep;
 
 public class PerformanceTest extends BaseTest {
 
@@ -29,6 +30,7 @@ public class PerformanceTest extends BaseTest {
     @Step("Navigate to Google for execution #{executionNumber}")
     private void navigateToGoogle(int executionNumber) {
         open("https://www.google.com");
+        sleep(50000); // Simulate long-running operation
     }
 
 }
